@@ -4,9 +4,70 @@
   --ink-soft: #5C594F;
   --accent: #F5D547;
   --line: #DAD5C7;
+  --img-edge: transparent;
+  color-scheme: light;
+}
+
+/* Dark mode: same brand colors, flipped */
+:root[data-theme="dark"] {
+  --bg: #0D0D0D;
+  --ink: #F2F0EB;
+  --ink-soft: #A8A498;
+  --line: #2A2926;
+  --img-edge: #2A2926;
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
+
+body { transition: background-color 0.25s ease, color 0.25s ease; }
+
+/* Theme toggle */
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+  padding: 0;
+  background: none;
+  border: none;
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  cursor: pointer;
+  width: fit-content;
+}
+
+.theme-toggle:hover { color: var(--ink); }
+
+.theme-toggle .track {
+  width: 30px;
+  height: 16px;
+  border-radius: 999px;
+  border: 1px solid var(--ink-soft);
+  position: relative;
+  transition: border-color 0.25s ease;
+}
+
+.theme-toggle .track::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--ink-soft);
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+
+:root[data-theme="dark"] .theme-toggle .track { border-color: var(--accent); }
+
+:root[data-theme="dark"] .theme-toggle .track::after {
+  transform: translateX(14px);
+  background: var(--accent);
+}
 
 html { scroll-behavior: smooth; }
 
@@ -157,6 +218,43 @@ button:focus-visible {
   color: var(--ink-soft);
 }
 
+.sub-heading {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin: 2rem 0 0.75rem;
+}
+
+.about-section .sub-heading:first-of-type { margin-top: 0; }
+
+.contact-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0 0;
+}
+
+.contact-list li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  padding: 0.85rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.contact-list li:last-child { border-bottom: 1px solid var(--line); }
+
+.contact-label {
+  width: 6rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  padding-top: 0.15rem;
+}
+
 .contact-link {
   color: var(--ink);
   text-decoration: underline;
@@ -166,10 +264,14 @@ button:focus-visible {
 
 /* Project cards */
 
+.work-section { counter-reset: project; }
+
 .project {
+  counter-increment: project;
   display: grid;
-  grid-template-columns: 200px 1fr;
+  grid-template-columns: 320px 1fr;
   gap: 2rem;
+  align-items: start;
   padding: 2.25rem 0;
   border-top: 1px solid var(--line);
 }
@@ -180,14 +282,61 @@ button:focus-visible {
 
 .project-image {
   aspect-ratio: 4 / 3;
-  background: var(--ink);
-  color: var(--bg);
+  overflow: hidden;
+  background: #0D0D0D;
+  outline: 1px solid var(--img-edge);
+}
+
+.project-image span {
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: var(--bg);
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 1.25rem;
+  font-size: 1.75rem;
   letter-spacing: 0.5px;
+  transition: transform 0.35s ease;
+}
+
+.project-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.35s ease;
+}
+
+/* Project number, small accent above the title */
+.project-body::before {
+  content: counter(project, decimal-leading-zero);
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--ink-soft);
+  margin-bottom: 0.35rem;
+}
+
+.project-title {
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 4px;
+  transition: text-decoration-color 0.25s ease;
+}
+
+/* Hover only on devices that actually hover */
+@media (hover: hover) {
+  .project:hover .project-image span,
+  .project:hover .project-image img {
+    transform: scale(1.04);
+  }
+
+  .project:hover .project-title {
+    text-decoration-color: var(--accent);
+  }
 }
 
 .project-head {
@@ -233,6 +382,8 @@ button:focus-visible {
 
 .project-desc {
   max-width: 55ch;
+  font-size: 0.9rem;
+  line-height: 1.55;
   color: var(--ink-soft);
   margin: 0 0 1rem;
 }
@@ -260,6 +411,19 @@ button:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
   html { scroll-behavior: auto; }
+}
+
+/* Tablet: text column gets too narrow next to the bigger image, so stack */
+
+@media (max-width: 1100px) {
+  .project {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .project-image {
+    aspect-ratio: 16 / 9;
+  }
 }
 
 /* Mobile */
